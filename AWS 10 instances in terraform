@@ -1,0 +1,19 @@
+provider "aws" {
+  region = "us-east-1" # Specify your AWS region
+}
+
+resource "aws_key_pair" "deployer_key" {
+  key_name   = "deployer-key"
+  public_key = file("${path.module}/deployer-key.pub") # Ensure you have a public key at this path
+}
+
+resource "aws_instance" "example" {
+  count         = 10 # Create 10 instances
+  ami           = "ami-0c02fb55956c7d316" # Example AMI, replace with a valid one for your region
+  instance_type = "t2.micro"
+  key_name      = aws_key_pair.deployer_key.key_name
+
+  tags = {
+    Name = "Instance ${count.index + 1}"
+  }
+}
